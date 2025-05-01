@@ -1,0 +1,100 @@
+
+---
+title: "A/B Testing Analysis: E-Commerce Landing Page Redesign"
+author: "Chanya Trakulmaykee"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(dplyr)
+library(ggplot2)
+library(broom)
+```
+
+## 🎯 Project Objective
+
+Determine if a new landing page version leads to a significantly higher user conversion rate than the old page.
+
+## 📂 Load the Dataset
+
+```{r load-data}
+ab_data <- read.csv("~/Downloads/ab_data.csv")
+head(ab_data)
+str(ab_data)
+summary(ab_data)
+```
+
+## 🧼 Data Cleaning
+
+Check for inconsistencies: users appearing in both groups or mismatched landing pages.
+
+```{r clean-data}
+# Check if landing page and group match
+ab_data_clean <- ab_data %>%
+  filter((group == "control" & landing_page == "old_page") |
+         (group == "treatment" & landing_page == "new_page"))
+
+# Remove duplicate users
+ab_data_clean <- ab_data_clean[!duplicated(ab_data_clean$user_id), ]
+```
+
+## 📊 Conversion Rate Comparison
+
+```{r conversion-rates}
+ab_data_clean %>%
+  group_by(group) %>%
+  summarise(conversion_rate = mean(converted))
+```
+
+## 📈 Visualization
+
+```{r conversion-plot}
+ab_data_clean %>%
+  group_by(group) %>%
+  summarise(conversion_rate = mean(converted)) %>%
+  ggplot(aes(x = group, y = conversion_rate, fill = group)) +
+  geom_col(width = 0.6) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Conversion Rate by Group", x = "", y = "Conversion Rate") +
+  theme_minimal()
+```
+
+## 📐 Hypothesis Testing
+
+- **Null Hypothesis (H₀):** Conversion rates are equal
+- **Alternative Hypothesis (H₁):** Conversion rates are different
+
+```{r hypothesis-test}
+# Contingency table
+table_data <- table(ab_data_clean$group, ab_data_clean$converted)
+
+# Proportion z-test
+test_result <- prop.test(table_data)
+tidy(test_result)
+```
+
+## ✅ Interpretation
+
+- **p-value:** 
+p = 0.1918 > 0.05
+- 
+**Conclusion:**  
+We fail to reject the null hypothesis. There is no statistically significant difference.
+The difference in conversion rates between the control and treatment groups is likely due to random chance, not the new landing page.
+
+## 💼 Business Recommendation
+
+Stick with the current (old) landing page.
+Launching the new version likely won't improve business performance, and may not justify design or development costs.
+
+---
+
+## 📎 Summary
+
+**Tools Used:** R, dplyr, ggplot2  
+**Test:** 2-proportion z-test  
+**Decision:** Data-driven conclusion based on user behavior
+
+```
