@@ -41,7 +41,7 @@ Stick with the current landing page, as there is no clear evidence that the new 
 
 ## 📎 Report
 
-View the full R Markdown analysis 👉 [Report HTML](#) *(Replace this link with your uploaded file once hosted)*
+View the full R Markdown analysis 👉 [Report HTML](https://github.com/cytkmk/ecommerce-ab-test/blob/main/ecommerce_ab_test.html) 
 
 ---
 
